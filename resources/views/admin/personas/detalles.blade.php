@@ -1,145 +1,73 @@
 @extends('layouts.dash2')
 
 @section('content')
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Nube Colectiva">
-    <link rel="icon" href="/img/logo_farmacia.png" />
-    <meta name="theme-color" content="#000000" />
-
-    <title>Detalles</title>
-
-    <!-- Bootstrap -->
-    @vite(['resources/js/app.js'])
-
-  </head>
-
-  <body>
-
-      <div class="container mt-5 mb-5">
-            <div class="col-md-12">
-              <div class="header">
-         <div class="container">
-            <div class="row">
-               <div class="col-md-5">
-                  <!-- Logo -->
-                  <div class="logo">
-                     <h1>Detalles Persona</h1>
-                  </div>
-               </div>
-               <div class="col-md-5">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group form">
-                           
-                      </div>
-                    </div>
-                  </div>
-               </div>
-               <div class="col-md-2">
-                  <div class="navbar navbar-inverse" role="banner">
-                      <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
-                        <ul class="nav navbar-nav">
-                          <li><a href="{{ route('admin.personas') }}">Detalles</a></li>
-                        </ul>
-                      </nav>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-
-      <div class="page-content">
-        <div class="row">
-            <div class="col-md-10">
-
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.personas') }}">Personas</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $personas->nombre }}</li>
-          </ol>
-        </nav>
-
-        <div class="row">
-
-          <div class="col-md-12">
-
-              <div class="content-box-large">
-
-                <div class="panel-body">
-
-                  @if(Session::has('message'))
-                    <div class="alert alert-primary" role="alert">
-                      {{ Session::get('message') }}
-                    </div>
-                  @endif
-
-                    <p class="h5">Nombre:</p>
-                    <p class="h6 mb-3">{{ $personas->nombre }}</p>
-
-                    <p class="h5">Apellido Paterno:</p>
-                    <p class="h6 mb-3">{{ $personas->apellido_paterno }}</p>
-                      <p class="h5">Apellido Materno:</p>
-                      <p class="h6 mb-3">{{ $personas->apellido_materno }}</p>
-                      <p class="h5">Dirección</p>
-                      <p class="h6 mb-3">{{ $personas->direccion}}</p>
-                      <p class="h5">Telefono:</p>
-                      <p class="h6 mb-3">{{ $personas->telefono}}</p>
-                    <p class="h5">Correo:</p>
-                    <p class="h6 mb-3">{{ $personas->correo }}</p>
-
-                    <p class="h5">Imagen:</p>
-                    <img src="../../../uploads/{{ $personas->img }}" class="img-fluid" width="20%">
-
+    <div x-data="{ showModal: true }" class="container mx-auto p-4">
+        <!-- Modal -->
+        <div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+                <!-- Encabezado del Modal -->
+                <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-indigo-600 to-indigo-800 text-white rounded-t-lg">
+                    <h2 class="text-xl font-semibold">Detalles de Persona</h2>
+                    <a href="{{ route('admin.personas.index') }}" class="text-white hover:text-gray-300">&times;</a>
                 </div>
 
-                <a href="{{ route('admin.personas') }}" class="btn btn-warning mt-3">Volver</a>
+                <!-- Contenido del Modal -->
+                <div class="px-6 py-4">
+                    <!-- Mensaje -->
+                    @if(Session::has('message'))
+                        <div class="bg-blue-100 text-blue-800 p-4 rounded-lg mb-4">
+                            {{ Session::get('message') }}
+                        </div>
+                    @endif
 
-              </div>
+                    <!-- Detalles -->
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-semibold text-lg">Nombre:</p>
+                            <p class="text-gray-700">{{ $personas->nombre }}</p>
+                        </div>
 
-          </div>
+                        <div>
+                            <p class="font-semibold text-lg">Apellido Paterno:</p>
+                            <p class="text-gray-700">{{ $personas->apellido_paterno }}</p>
+                        </div>
 
-        </div>
+                        <div>
+                            <p class="font-semibold text-lg">Apellido Materno:</p>
+                            <p class="text-gray-700">{{ $personas->apellido_materno }}</p>
+                        </div>
 
-      </div>
+                        <div>
+                            <p class="font-semibold text-lg">Dirección:</p>
+                            <p class="text-gray-700">{{ $personas->direccion }}</p>
+                        </div>
 
-      </div>
+                        <div>
+                            <p class="font-semibold text-lg">Teléfono:</p>
+                            <p class="text-gray-700">{{ $personas->telefono }}</p>
+                        </div>
 
-        </div>
+                        <div>
+                            <p class="font-semibold text-lg">Correo:</p>
+                            <p class="text-gray-700">{{ $personas->correo }}</p>
+                        </div>
 
+                        <div>
+                            <p class="font-semibold text-lg">Imagen:</p>
+                            <img src="../../../uploads/{{ $personas->img }}" class="rounded shadow-lg w-32">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pie del Modal -->
+                <div class="px-6 py-4 border-t flex justify-end space-x-2">
+                    <a href="{{ route('admin.personas.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cerrar</a>
+                    <a href="{{ route('admin.personas.index') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Volver</a>
+                </div>
             </div>
+        </div>
+    </div>
 
-          </div>
-
-          <hr>
-
-
-
-    <footer class="text-muted mt-3 mb-3">
-        <div align="center">
-          Desarrollado Por <a  target="_blank">Equipo Net Team</a>
-      </div>
-    </footer>
-
-    <script type="text/javascript">
-
-        function confirmarEliminar()
-        {
-        var x = confirm("Estas seguro de Eliminar?");
-        if (x)
-          return true;
-        else
-          return false;
-        }
-
-    </script>
-
-
-  </body>
-</html>
-
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 @endsection
+

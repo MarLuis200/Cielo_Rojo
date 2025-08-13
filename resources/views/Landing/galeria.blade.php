@@ -16,11 +16,11 @@
 <body class="transition-colors duration-300 bg-white dark:bg-[#0f172a] text-gray-800 dark:text-[#f8fafc]">
 <nav class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600" x-data="{ open: false }">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="{{ asset('img/cielo2.png') }}" class="h-8 w-8 rounded-full" alt="Logo">
-            <span class="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-gray-800 dark:text-white">Cielo Rojo</span>
-        </a>
 
+        <a href="#" class="flex items-center space-x-0 rtl:space-x-reverse mr-auto">
+            <img src="{{ asset('img/cielo2.png') }}" class="h-8 w-8 rounded-full" alt="Logo">
+            <span class="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-gray-800 dark:text-white">CieloRojo</span>
+        </a>
 
         <div class="flex items-center space-x-3 md:space-x-6 md:order-2">
             <button @click="open = !open" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-sticky" aria-expanded="false">
@@ -51,13 +51,13 @@
                     <a href="{{ route('landing.quienes.somos') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">¿Quiénes Somos?</a>
                 </li>
                 <li>
-                    <a href="{{ route('landing.quienes.somos') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Acerca De</a>
+                    <a href="{{ route('landing.acerca') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Acerca De</a>
                 </li>
                 <li>
-                    <a href="{{ route('landing.quienes.somos') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Premios</a>
+                    <a href="{{ route('landing.premios') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Pemios</a>
                 </li>
                 <li>
-                    <a href="{{ route('landing.quienes.somos') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Donaciones</a>
+                    <a href="{{ route('landing.donaciones') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Donaciones</a>
                 </li>
 
                 <li>
@@ -73,8 +73,12 @@
             </ul>
         </div>
 
-        <div class="hidden md:flex space-x-6">
-            <a href="#" class="px-4 py-2 text-sm bg-blue-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-gray-300 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Acceso</a>
+        <div class="hidden md:flex space-x-4 mr-auto"></div>
+
+
+        <div class="hidden md:flex space-x-4">
+            <a href="{{ route('login') }}" class="px-4 py-2 text-sm bg-blue-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-green-600 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Login</a>
+            <a href="{{ route('register') }}" class="px-4 py-2 text-sm bg-yellow-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-pink-400 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Registro</a>
         </div>
     </div>
 </nav>

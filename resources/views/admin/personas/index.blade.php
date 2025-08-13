@@ -1,197 +1,140 @@
 @extends('layouts.dash2')
 
 @section('content')
-<!doctype html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Nube Colectiva">
-    <link rel="icon" href="/img/logo_farmacia.png" />
-    <meta name="theme-color" content="#000000" />
-    <title>Clientes</title>
-    <!-- Bootstrap -->
-    @vite(['resources/js/app.js'])
 
-    <style>
-        .navbar-search .form-control {
-            width: 400px; /* Ajusta el tamaño según sea necesario */
-        }
-    </style>
-</head>
+    <div x-data="{ showModal: false, showDeleteModal: false, deleteId: null }" class="container mx-auto p-4 h-screen overflow-y-auto">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Personas</h1>
+            <button @click="showModal = true" class="flex items-center bg-blue-600 text-white px-4 py-2 mt-2 sm:mt-0 rounded-md hover:bg-blue-700 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Crear Persona
+            </button>
+        </div>
 
-<body>
+        <div class="mb-6">
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Buscar personas..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
+                oninput="filterPersons()"
+            >
+        </div>
 
-    <div class="container mt-5 mb-5">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="header">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <!-- Logo -->
-                                <div class="logo">
-                                    <h1>Personas</h1>
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="input-group form">
-                                           <!-- Topbar Search -->
-                                            <form id="globalSearchForm" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                                                <div class="input-group">
-                                                    <input type="text" id="searchInput" class="form-control bg-light border-0 small" placeholder="Buscar..." aria-label="Search" aria-describedby="basic-addon2">
-                                                    <div class="input-group-append">
-                                                        <button class="btn btn-primary" type="button">
-                                                            <i class="bx bx-search"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="navbar navbar-inverse" role="banner">
-                                    <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation"></nav>
-                                </div>
-                            </div>
+        <!-- Tarjetas de Personas -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($personas as $person)
+                <div class="relative bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <!-- Enlace Directo a los Detalles -->
+                    <a href="{{ route('admin.personas.detalles', $person->id) }}" class="block">
+                        <!-- Imagen -->
+                        <img src="{{ asset('uploads/' . $person->img) }}"
+                             class="w-full h-56 object-cover transition-transform duration-300 hover:scale-105"
+                             alt="Imagen de {{ $person->nombre }}">
+
+                        <!-- Contenido -->
+                        <div class="p-5">
+                            <h2 class="text-lg font-extrabold text-gray-800 truncate tracking-wide">
+                                {{ $person->nombre }} {{ $person->apellido_paterno }}
+                            </h2>
+                            <p class="text-sm text-gray-600 font-medium mt-2"><strong>Dirección:</strong> {{ $person->direccion }}</p>
+                            <p class="text-sm text-gray-600 font-medium mt-2"><strong>Teléfono:</strong> {{ $person->telefono }}</p>
+                            <p class="text-sm text-gray-600 font-medium mt-2"><strong>Correo:</strong> {{ $person->correo }}</p>
+                        </div>
+                    </a>
+
+                    <!-- Botón Eliminar -->
+                    <div class="p-5 flex justify-end">
+                        <button @click="deleteId = {{ $person->id }}; showDeleteModal = true;"
+                                class="flex items-center text-red-600 hover:text-red-800 font-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M9 6v12m6-12v12M4 6l1.5-2h13l1.5 2" />
+                            </svg>
+                            Eliminar
+                        </button>
+                    </div>
+
+                    <div class="absolute top-0 left-0 h-2 w-full bg-blue-600"></div>
+                </div>
+            @endforeach
+        </section>
+
+
+
+        <!-- Modal Crear Persona -->
+        <div x-show="showModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                <div class="px-6 py-4 border-b flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Crear Persona</h2>
+                    <button @click="showModal = false" class="text-gray-500 hover:text-gray-700">&times;</button>
+                </div>
+                <form method="POST" action="{{ route('admin.personas.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre:</label>
+                            <input id="nombre" name="nombre" type="text" placeholder="Nombre" required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="apellido_paterno" class="block text-sm font-medium text-gray-700">Apellido Paterno:</label>
+                            <input id="apellido_paterno" name="apellido_paterno" type="text" placeholder="Apellido Paterno" required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="apellido_materno" class="block text-sm font-medium text-gray-700">Apellido Materno:</label>
+                            <input id="apellido_materno" name="apellido_materno" type="text" placeholder="Apellido Materno" required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="direccion" class="block text-sm font-medium text-gray-700">Dirección:</label>
+                            <input id="direccion" name="direccion" type="text" placeholder="Dirección" required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono:</label>
+                            <input id="telefono" name="telefono" type="text" placeholder="Teléfono" required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="correo" class="block text-sm font-medium text-gray-700">Correo:</label>
+                            <input id="correo" name="correo" type="email" placeholder="Correo" required
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="img" class="block text-sm font-medium text-gray-700">Imagen:</label>
+                            <input id="img" name="img" type="file"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </div>
-                </div>
-
-                <div class="page-content">
-                    <div class="row"></div>
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="panel-body">
-                                    @if(Session::has('message'))
-                                    <div class="alert alert-primary" role="alert">
-                                        {{ Session::get('message') }}
-                                    </div>
-                                    @endif
-                                    
-                                    <!-- Contenido de tu página -->
-                                    <button type="button" class="btn btn-success mt-4 ml-3" data-toggle="modal" data-target="#exampleModal">Crear
-                                    </button>
-
-                                    <form method="POST" action="{{ route('admin.personas.store') }}" role="form" enctype="multipart/form-data">
-                                    
-                                                                <!-- Modal -->
-                                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                      <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                          <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Crear Persona</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                              <span aria-hidden="true">&times;</span>
-                                            </button>
-                                          </div>
-                                          <form>
-                                              <div class="modal-body">
-                                                  
-                                                    <input type="hidden" name="_method" value="PUT">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                    @include('admin.personas.frm.prt')
-                                              </div>
-                                          </form>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    </form>
-
-                                    <!-- Incluye jQuery y la librería de Bootstrap JS -->
-                                    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-                                    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-                                    <section class="example mt-4">
-                                        <div class="row" id="personasContainer">
-                                            @foreach($personas as $person)
-                                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4 persona-card">
-                                                <div class="card">
-                                                    <img src="{!! asset('uploads/' . $person->img) !!}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Imagen de {{$person->nombre}}">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">{{$person->nombre}} {{$person->apellido_paterno}} {{$person->apellido_materno}}</h5>
-                                                        <p class="card-text">Dirección: {{$person->direccion}}</p>
-                                                        <p class="card-text">Teléfono: {{$person->telefono}}</p>
-                                                        <p class="card-text">Correo: {{$person->correo}}</p>
-                                                        <div class="text-center">
-                                                            <a href="{{ route('admin.personas.detalles', $person->id) }}" class="btn btn-dark">Detalles</a>
-                                                            
-                                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDelete{{$person->id}}">
-                                                                Eliminar
-                                                            </button>
-
-                                                            <!-- Modal de Confirmación de Eliminación -->
-                                                            <div class="modal fade" id="confirmDelete{{$person->id}}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteLabel{{$person->id}}" aria-hidden="true">
-                                                                <div class="modal-dialog" role="document">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title" id="confirmDeleteLabel{{$person->id}}">Confirmar Eliminación</h5>
-                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                                <span aria-hidden="true">&times;</span>
-                                                                            </button>
-                                                                        </div>
-                                                                        <div class="modal-body">
-                                                                            ¿Estás seguro de que deseas eliminar esta persona?
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                                                            <form action="{{ route('admin.personas.eliminar', $person->id) }}" method="POST" style="display: inline-block;">
-                                                                                @csrf
-                                                                                @method('PUT')
-                                                                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                                            </form>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="px-6 py-3 border-t flex justify-end space-x-2">
+                        <button @click="showModal = false" type="button" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Guardar</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
 
-        <hr>
+        <!-- Modal Confirmar Eliminación -->
+        <div x-show="showDeleteModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
+                <div class="px-6 py-4">
+                    <h3 class="text-lg font-semibold text-gray-800">¿Estás seguro de eliminar esta persona?</h3>
+                </div>
+                <div class="px-6 py-4 flex justify-end space-x-2 border-t">
+                    <button @click="showDeleteModal = false" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">Cancelar</button>
+                    <form :action="`/admin/personas/eliminar/${deleteId}`" method="POST" class="inline-block">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer class="text-muted mt-3 mb-3">
-        <div align="center">
-            Desarrollado Por <a target="_blank">Equipo Net Team</a>
-        </div>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    <script type="text/javascript">
-    function confirmarEliminar() {
-        var x = confirm("¿Estás seguro de Eliminar?");
-        if (x)
-            return true;
-        else
-            return false;
-    }
-    $(document).ready(function() {
-        $('#searchInput').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
-            $('#personasContainer .persona-card').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        });
-    });
-    </script>
-</body>
-</html>
 @endsection

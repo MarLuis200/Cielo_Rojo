@@ -1,68 +1,51 @@
 @extends('layouts.dash2')
 
 @section('content')
-    <div class="container mt-5 mb-5">
-        <div class="col-md-12">
-            <div class="header">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-5">
-                            <div class="logo">
-                                <h1>Actualizar Publicación</h1>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="navbar navbar-inverse" role="banner">
-                                <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
-                                    <ul class="nav navbar-nav">
-                                        <li><a href="{{ route('admin.publicaciones') }}">Actualizar Publicación</a></li>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+    <!-- Fila con botones a los extremos -->
+    <div class="flex justify-between mb-4">
+        <a href="{{ route('admin.publicaciones') }}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-400">
+            Regresar a las publicaciones
+        </a>
+
+        <button type="submit" form="updateForm" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-400">
+            Actualizar
+        </button>
+    </div>
+
+    <div class="container mx-auto p-6">
+        <form method="POST" action="{{ route('admin.publicaciones.update', $post->id) }}" class="bg-white p-6 rounded-lg shadow-lg" id="updateForm">
+            @csrf
+            @method('PUT')
+
+            <div class="mb-6">
+                <label for="title" class="block text-gray-700 font-medium mb-2">Título</label>
+                <input type="text" name="title" value="{{ old('title', $post->title) }}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" required>
             </div>
 
-            <div class="page-content">
-                <div class="row">
-                    <div class="col-md-10">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.publicaciones') }}">Publicaciones</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Actualizar</li>
-                            </ol>
-                        </nav>
-
-                        <div class="content-box-large">
-                            <div class="panel-heading">
-                                <div class="panel-title"><h2>Actualizar</h2></div>
-                            </div>
-
-                            <div class="panel-body">
-                                <section class="example mt-4">
-                                    <form method="POST" action="{{ route('admin.publicaciones.update', $publicaciones->id) }}" role="form" enctype="multipart/form-data">
-                                        @csrf
-                                        @method('PUT')
-
-                                        @include('admin.publicaciones.frm.prt')
-
-                                        <button type="submit" class="btn btn-info">Guardar</button>
-                                        <a href="{{ route('admin.publicaciones') }}" class="btn btn-warning">Cancelar</a>
-                                    </form>
-                                </section>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="mb-6">
+                <label for="category" class="block text-gray-700 font-medium mb-2">Categoría</label>
+                <select name="category" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" required>
+                    <option value="blog" {{ $post->category == 'blog' ? 'selected' : '' }}>Blog</option>
+                    <option value="project" {{ $post->category == 'project' ? 'selected' : '' }}>Proyecto</option>
+                </select>
             </div>
 
-            <hr>
-            <footer class="text-muted mt-3 mb-3">
-                <div align="center">
-                    Desarrollado Por <a href="http://www.nubecolectiva.com" target="_blank">Equipo Net Team</a>
-                </div>
-            </footer>
-        </div>
+            <!-- Contenido dinámico con scroll -->
+            <div id="dynamicFields" class="space-y-4 overflow-y-auto max-h-[400px] mb-6 border p-4 rounded-lg bg-gray-50">
+                @foreach ($post->content as $key => $element)
+                    <div class="flex items-center space-x-4 mb-4">
+                        <select name="fields[{{ $key }}][type]" class="border border-gray-300 p-3 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 w-1/3">
+                            <option value="title" {{ $element['type'] == 'title' ? 'selected' : '' }}>Título</option>
+                            <option value="text" {{ $element['type'] == 'text' ? 'selected' : '' }}>Texto</option>
+                            <option value="image" {{ $element['type'] == 'image' ? 'selected' : '' }}>Imagen</option>
+                            <option value="video" {{ $element['type'] == 'video' ? 'selected' : '' }}>Video</option>
+                        </select>
+                        <input type="text" name="fields[{{ $key }}][value]" value="{{ $element['value'] }}" class="w-2/3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                @endforeach
+            </div>
+
+        </form>
     </div>
 @endsection

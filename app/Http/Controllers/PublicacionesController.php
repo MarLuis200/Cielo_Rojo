@@ -2,127 +2,142 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Personas;
 use Illuminate\Http\Request;
-use App\Models\Publicaciones;
-use App\Models\Tipos;
-use Session;
-use Redirect;
-use App\Http\Requests\CreatePublicaciones;
-use App\Http\Requests\UpdatePublicaciones;
-use Illuminate\Support\Facades\Validator;
-use DB;
-use Input;
-use Storage;
-use DateTime;
+use App\Models\Post;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
 
 class PublicacionesController extends Controller
 {
     public function index()
-{
-    $publicaciones = Publicaciones::with('tipo', 'persona')->get();
-    $tipos = Tipos::all();
-    $personas = Personas::all();
-    return view('admin.publicaciones.index', compact('publicaciones', 'tipos', 'personas'));
-}
+    {
+        $posts = Post::all();
+
+        foreach ($posts as $post) {
+            if (is_string($post->content)) {
+                $post->content = json_decode($post->content, true);
+            }
+        }
+
+        return view('admin.publicaciones.index', compact('posts'));
+    }
 
 
     public function crear()
     {
-        $publicaciones = Publicaciones::all(); // Obtén las publicaciones si es necesario
-        return view('admin.publicaciones.crear', compact('publicaciones'));
+        $posts = Post::all();
+        return view('admin.publicaciones.crear', compact('posts'));
     }
 
-
-    public function store(CreatePublicaciones $request)
+    public function store(Request $request)
     {
-        $publicaciones = new Publicaciones;
-        $publicaciones->titulo = $request->titulo;
-        $publicaciones->descripcion = $request->descripcion;
-        $publicaciones->fecha_creacion = $request->fecha_creacion;
-        $publicaciones->id_tipo = $request->id_tipo;
-        $publicaciones->id_persona = $request->id_persona;
-        $publicaciones->contenido = $request->contenido;
-        if ($request->hasFile('img')) {
-            $publicaciones->img = $request->file('img')->store('/');
+        // Validar los datos del formulario
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'required|in:blog,project',
+            'content' => 'required|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $content = $request->input('content');
+
+        // Procesar imágenes si existen
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('uploads', 'public');
+                if (isset($content[$index]) && $content[$index]['type'] === 'image') {
+                    $content[$index]['value'] = Storage::url($path);
+                }
+            }
         }
 
-        $publicaciones->created_at = now();
-        $publicaciones->save();
+        $post = Post::create([
+            'title' => $request->title,
+            'category' => $request->category,
+            'content' => json_encode($content),
+        ]);
 
-        return redirect('admin/publicaciones')->with('message', 'Guardado Satisfactoriamente!');
+        return redirect()->route('admin.publicaciones')
+            ->with('message', 'Publicación creada con éxito.');
     }
 
+    // Mostrar una publicación específica
     public function show($id)
     {
-        $publicaciones = Publicaciones::findOrFail($id);
-        $tipos = Tipos::all();
-        $personas = Personas::all();
-        return view('admin.publicaciones.detalles', compact('publicaciones', 'tipos', 'personas'));
+        $post = Post::findOrFail($id); // Obtener la publicación por ID
+        return view('admin.publicaciones.detalles', compact('post'));
     }
 
-    public function showPublicaciones($id)
-    {
-        $publicaciones = Publicaciones::findOrFail($id);
-        return view('admin.publicaciones.vista', compact('publicaciones'));
-    }
 
-    public function actualizar($id)
+    public function editar($id)
     {
-        $publicaciones = Publicaciones::findOrFail($id);
-        $tipos = Tipos::all();
-        $personas = Personas::all();
-        return view('admin.publicaciones.actualizar', compact('tipos', 'personas', 'publicaciones'));
-    }
+        $post = Post::findOrFail($id);
 
-    public function update(UpdatePublicaciones $request, $id)
-    {
-        $publicaciones = Publicaciones::findOrFail($id);
-        $publicaciones->titulo = $request->titulo;
-        $publicaciones->descripcion = $request->descripcion;
-        $publicaciones->fecha_creacion = $request->fecha_creacion;
-        $publicaciones->id_tipo = $request->id_tipo;
-        $publicaciones->id_persona = $request->id_persona;
-        $publicaciones->contenido = $request->contenido;
-
-        // Recibo la imagen desde el formulario Actualizar
-        if ($request->hasFile('img')) {
-            $publicaciones->img = $request->file('img')->store('/');
+        if (is_string($post->content)) {
+            $post->content = json_decode($post->content, true);
         }
 
-        // Guardamos la fecha de actualización del registro
-        $publicaciones->updated_at = now();
-
-        // Actualizo los datos en la tabla 'publicaciones'
-        $publicaciones->save();
-
-        // Muestro un mensaje y redirecciono a la vista principal
-        Session::flash('message', 'Editado Satisfactoriamente!');
-        return Redirect::to('admin/publicaciones');
+        return view('admin.publicaciones.editar', compact('post'));
     }
 
-    // Eliminar un Registro
+
+    public function update(Request $request, $id)
+    {
+        // Validar los datos del formulario
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'required|in:blog,project',
+            'fields' => 'required|array', // Validar los campos dinámicos
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Obtener la publicación que se va a actualizar
+        $post = Post::findOrFail($id);
+
+        // Obtener los campos del formulario (campos dinámicos)
+        $content = $request->input('fields'); // Obtenemos los campos dinámicos
+
+        // Procesar las imágenes si existen
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('uploads', 'public');
+                if (isset($content[$index]) && $content[$index]['type'] === 'image') {
+                    $content[$index]['value'] = Storage::url($path);
+                }
+            }
+        }
+
+
+        $post->update([
+            'title' => $request->title,
+            'category' => $request->category,
+            'content' => json_encode($content),
+        ]);
+
+        return redirect()->route('admin.publicaciones')
+            ->with('message', 'Publicación actualizada con éxito.');
+    }
+
+
     public function eliminar($id)
     {
-        $publicaciones = Publicaciones::findOrFail($id);
-
-        // Elimino la imagen de la carpeta 'uploads'
-        if ($publicaciones->img) {
-            $imagen = explode(",", $publicaciones->img);
-            Storage::delete($imagen);
+        $post = Post::findOrFail($id);
+        $content = $post->content;
+        if (is_string($content)) {
+            $content = json_decode($content, true);
         }
 
-        // Elimino el registro de la tabla 'publicaciones'
-        $publicaciones->delete();
+        foreach ($content as $item) {
+            if ($item['type'] === 'image' && isset($item['value'])) {
+                $imagePath = str_replace('/storage/', '', $item['value']);
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
 
-        // Muestro un mensaje y redirecciono a la vista principal
-        Session::flash('message', 'Eliminado Satisfactoriamente!');
-        return Redirect::to('admin/publicaciones');
+        $post->delete();
+
+        return redirect()->route('admin.publicaciones')
+            ->with('message', 'Publicación eliminada con éxito.');
     }
 
-    public function vista($id)
-    {
-        $publicaciones = Publicaciones::findOrFail($id);
-        return view('publicaciones.vista', compact('publicaciones'));
-    }
 }

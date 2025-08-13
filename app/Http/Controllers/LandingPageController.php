@@ -1,7 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Productos;
+use App\Models\Project;
+use App\Models\Post;
 use App\Models\Tipos;
 use Illuminate\Http\Request;
 
@@ -15,30 +16,26 @@ class LandingPageController extends Controller
 
     public function blogs()
     {
-        $tipoBlog = Tipos::where('desc_tipos', 'blog')->first();
+        $blogs = Post::where('category', 'blog')->get();
 
-        if ($tipoBlog)
-        {
-            $blogs = Productos::where('id_tipo', $tipoBlog->id)->get();
-        } else
-        {
-            $blogs = [];
+        foreach ($blogs as $blog) {
+            if (is_string($blog->content)) {
+                $blog->content = json_decode($blog->content, true);
+            }
         }
         return view('landing.blogs', compact('blogs'));
     }
 
     public function proyectos()
     {
-        $tipoProyecto = Tipos::where('desc_tipos', 'proyecto')->first();
-
-        if ($tipoProyecto)
-        {
-            $proyectos = Productos::where('id_tipo', $tipoProyecto->id)->get();
-        } else
-        {
-            $proyectos = [];
+        $projects = Post::where('category', 'project')->get();
+        foreach ($projects as $project) {
+            if (is_string($project->content)) {
+                $project->content = json_decode($project->content, true);
+            }
         }
-        return view('landing.proyectos', compact('proyectos'));
+
+        return view('Landing.proyectos', compact('projects'));
     }
 
 

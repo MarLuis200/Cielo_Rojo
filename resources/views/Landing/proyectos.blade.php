@@ -74,7 +74,7 @@
         </div>
 
         <div class="hidden md:flex space-x-6">
-            <a href="#" class="px-4 py-2 text-sm bg-blue-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-gray-300 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Acceso</a>
+            <a href="{{ route('login') }}" class="px-4 py-2 text-sm bg-blue-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-gray-300 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Acceso</a>
         </div>
     </div>
 </nav>
@@ -185,74 +185,51 @@
 
 
 <div id="proyectos" data-aos="zoom-in" class="mt-16 text-center">
-        <h1 class="text-3xl font-extrabold text-blue-500 dark:text-amber-300">Nuestros Proyectos</h1>
-    </div>
+    <h1 class="text-3xl font-extrabold text-blue-500 dark:text-amber-300">Nuestros Proyectos</h1>
+</div>
 
 <div class="lg:w-10/12 mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12">
-    <a href="#proyecto1" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-        <div class="relative overflow-hidden rounded-lg">
-            <img class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="img/proyecto.jpeg" alt="Proyecto 1">
-            <span class="absolute bottom-2 right-2 bg-blue-300 text-darken font-semibold px-4 py-px text-sm rounded-full">PROYECTO LA HUELLA DEL FUEGO</span>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-600 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">La Huella del Fuego es un proyecto multimedia que inició en marzo del 2019 con el objetivo de abordar los conflictos socioambientales en la microcuenca Amanalco-Valle...</p>
-    </a>
+    @foreach ($projects as $project)
+        <a href="{{ route('posts.project.show', $project->id) }}"  data-aos="fade-up" data-aos-delay="100" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
+            <div class="relative overflow-hidden rounded-lg">
+                @if(isset($project->content[0]['value']))
+                    <img class="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="{{ $project->content[0]['value'] }}" alt="{{ $project->title }}">
+                @else
+                    <img class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="default-image.jpg" alt="Imagen predeterminada">
+                @endif
+                <span class="absolute bottom-2 left-2 bg-blue-300 text-darken font-semibold px-4 py-px text-sm rounded-full">{{ $project->title }}</span>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">
+                @php
+                    $firstText = null;
+                    foreach ($project->content as $element) {
+                        if ($element['type'] === 'text') {
+                            $firstText = $element['value'];
+                            break;
+                        }
+                    }
+                @endphp
 
-    <!-- Proyecto 2 -->
-    <a href="#proyecto2" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-        <div class="relative overflow-hidden rounded-lg">
-            <img class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="img/proyecto2.jpeg" alt="Proyecto 2">
-            <span class="absolute bottom-2 left-2 bg-amber-500 text-darken font-semibold px-4 py-px text-sm rounded-full">EL ESPÍRITU DEL VALLE</span>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">Malinalxochitl, una cooperativa de productores de mezcal orgánico y artesanal en las montañas del sur del Estado de México, agrupa a campesinos que, siguiendo y adaptando la antigua tradición de esta tierra...</p>
-    </a>
-
-    <!-- Proyecto 3 -->
-    <a href="#proyecto3" data-aos="fade-up" data-aos-delay="500" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-        <div class="relative overflow-hidden rounded-lg">
-            <img class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="img/proyecto3.jpeg" alt="Proyecto 3">
-            <span class="absolute bottom-2 right-2 bg-yellow-300 text-darken font-semibold px-4 py-px text-sm rounded-full">BOSQUE DE NIEBLA</span>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">En las regiones montañosas del centro de México, existe un tipo particular de bosque muy diverso y complejo, reducto de grandes bosques anteriores a las glaciaciones, que ha sido definido por investigadores como una selva bajo un bosque templado...</p>
-    </a>
-
-    <!-- Proyecto 4 -->
-    <a href="#proyecto4" data-aos="fade-up" data-aos-delay="700" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-        <div class="relative overflow-hidden rounded-lg">
-            <img class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="img/proyecto4.jpeg" alt="Proyecto 4">
-            <span class="absolute bottom-2 left-2 bg-teal-100 text-darken font-semibold px-4 py-px text-sm rounded-full">FERIA DEL HONGO</span>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">San Antonio de la Laguna, Donato Guerra, comunidad mazahua enclavada en bosques de pino en el suroeste del Estado de México, cuenta con una tradición milenaria en el aprovechamiento de los hongos comestibles...</p>
-    </a>
-
-    <!-- Proyecto 5 -->
-    <a href="#proyecto5" data-aos="fade-up" data-aos-delay="900" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-        <div class="relative overflow-hidden rounded-lg aspect-w-4 aspect-h-3">
-            <img class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="img/proyecto6.jpeg" alt="Proyecto 5">
-            <span class="absolute bottom-2 right-2 bg-teal-100 text-darken font-semibold px-4 py-px text-sm rounded-full">BIODIVERSIDAD-MÁS ALLÁ DE LA MONARCA</span>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">En la Reserva de la Mariposa Monarca existen conexiones entre muchas especies que hacen posible el bienestar de la región.....</p>
-    </a>
-
-    <!-- Proyecto 6 -->
-    <a href="#proyecto6" data-aos="fade-up" data-aos-delay="900" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-        <div class="relative overflow-hidden rounded-lg aspect-w-4 aspect-h-3">
-            <img class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="img/proyecto5.jpeg" alt="Proyecto 6">
-            <span class="absolute bottom-2 left-2 bg-teal-100 text-darken font-semibold px-4 py-px text-sm rounded-full">RED MONARCA</span>
-        </div>
-        <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">Es importante conocerlas, y conocer a las comunidades y organizaciones que están uniendo esfuerzos por conservar estos delicados ecosistemas.....</p>
-    </a>
-
+                @if($firstText)
+                    {{ $firstText }}
+                @else
+                    Descripción no disponible.
+                @endif
+            </p>
+        </a>
+    @endforeach
 </div>
 
 
 
-</div>
+
+
+
 
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
     AOS.init();
 </script>
-</div>
 
 
 <footer class="bg-gray-900 text-white py-6">

@@ -1,58 +1,84 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" x-data="{ theme: localStorage.getItem('theme') || 'light', open: false }" :class="{ 'dark': theme === 'dark' }" x-init="$watch('theme', val => localStorage.setItem('theme', val))">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambiente Cielo Rojo</title>
     @vite('resources/css/app.css')
     @vite('resources/css/styles.css')
     @vite('resources/js/script.js')
+    <script src="{{ asset('js/carousel.js') }}"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <script type="module" src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <title>Ambiente Cielo Rojo</title>
 </head>
 
-<body class="text-gray-800">
-<nav class="bg-black bg-opacity-100 text-white fixed w-full z-50 top-0 border-b border-gray-900" x-data="{ open: false }" style="animation: slideDown 1.5s ease-out;">
-    <div class="max-w-screen-xl flex items-center justify-between mx-auto p-4">
-        <a href="#" class="flex items-center space-x-3">
+<body class="transition-colors duration-300 bg-white dark:bg-[#0f172a] text-gray-800 dark:text-[#f8fafc]">
+<nav class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600" x-data="{ open: false }">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+
+        <a href="#" class="flex items-center space-x-0 rtl:space-x-reverse mr-auto">
             <img src="{{ asset('img/cielo2.png') }}" class="h-8 w-8 rounded-full" alt="Logo">
-            <span class="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-white">Cielo Rojo</span>
+            <span class="self-center text-lg md:text-2xl font-semibold whitespace-nowrap text-gray-800 dark:text-white">CieloRojo</span>
         </a>
 
-        <!-- Botón para el menú móvil -->
-        <button @click="open = !open" class="md:hidden text-white focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
-
-        <!-- Menú para pantallas grandes -->
-        <div class="hidden md:flex items-center space-x-6">
-            <div class="space-x-4 flex items-center">
-                <a href="{{ route('landing.index') }}" class="py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Inicio</a>
-                <a href="{{ route('landing.proyectos') }}" class="py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Proyectos</a>
-                <a href="{{ route('landing.blogs') }}" class="py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Blogs</a>
-                <a href="#" class="py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Nosotros</a>
-            </div>
-            <div class="flex space-x-3">
-                <a href="#" class="px-4 py-2 text-sm bg-gray-800 text-white font-semibold rounded-full hover:bg-gray-700 transition duration-300">Login</a>
-                <a href="#" class="px-4 py-2 text-sm bg-gray-800 text-white font-semibold rounded-full hover:bg-yellow-600 transition duration-300">Registro</a>
-            </div>
+        <div class="flex items-center space-x-3 md:space-x-6 md:order-2">
+            <button @click="open = !open" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-sticky" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path x-show="!open" fill-rule="evenodd" d="M3 5h14a1 1 0 110 2H3a1 1 0 110-2zm0 6h14a1 1 0 110 2H3a1 1 0 110-2zm0 6h14a1 1 0 110 2H3a1 1 0 110-2z" clip-rule="evenodd"></path>
+                    <path x-show="open" fill-rule="evenodd" d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 011.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
         </div>
-    </div>
 
-    <!-- Menú desplegable para pantallas pequeñas -->
-    <div x-show="open" @click.away="open = false" class="md:hidden bg-black bg-opacity-90">
-        <div class="px-4 pt-4 pb-4 space-y-2">
-            <a href="{{ route('landing.index') }}" class="block py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Inicio</a>
-            <a href="{{ route('landing.proyectos') }}" class="block py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Proyectos</a>
-            <a href="{{ route('landing.blogs') }}" class="block py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Blogs</a>
-            <a href="#" class="block py-2 px-2 text-white hover:text-yellow-400 transition duration-300">Nosotros</a>
-            <div class="flex space-x-3 mt-4">
-                <a href="#" class="w-full px-4 py-2 text-sm bg-gray-800 text-white font-semibold rounded-full hover:bg-gray-700 transition duration-300 text-center">Login</a>
-                <a href="#" class="w-full px-4 py-2 text-sm bg-gray-800 text-white font-semibold rounded-full hover:bg-yellow-600 transition duration-300 text-center">Registro</a>
-            </div>
+
+        <div :class="open ? 'block' : 'hidden'" class="w-full md:flex md:items-center md:w-auto md:justify-center" id="navbar-sticky">
+            <ul class="flex flex-col p-2 md:p-0 mt-2 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-6 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                <li>
+                    <a href="{{ route('landing.index') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Inicio</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.proyectos') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Proyectos</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.blogs') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Blogs</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.galeria') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Galeria de Fotos</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.quienes.somos') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">¿Quiénes Somos?</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.acerca') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Acerca De</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.premios') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Pemios</a>
+                </li>
+                <li>
+                    <a href="{{ route('landing.donaciones') }}" class="block py-1 px-3 text-gray-900 dark:text-white hover:text-yellow-400 dark:hover:text-yellow-300 md:p-0 transition duration-300">Donaciones</a>
+                </li>
+
+                <li>
+                    <button @click="theme = theme === 'light' ? 'dark' : 'light'" class="p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition duration-300 ease-in-out focus:outline-none">
+                        <svg x-show="theme === 'light'" class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 5a5 5 0 000 10 5 5 0 000-10zm0-3a1 1 0 110 2h-.02a1 1 0 010-2H10zm0 16a1 1 0 110 2h-.02a1 1 0 010-2H10zm9-9a1 1 0 110 2v-.02a1 1 0 110-2V10zm-16 0a1 1 0 110 2H3a1 1 0 010-2h.02zM15.45 6.14a1 1 0 011.41 0l.02.02a1 1 0 010 1.41L16.88 8a1 1 0 11-1.41-1.42l-.02-.02zM4.12 13.76a1 1 0 110 1.42l-.02.02a1 1 0 01-1.41 0L2 14.17a1 1 0 111.42-1.41l.02.02z"/>
+                        </svg>
+                        <svg x-show="theme === 'dark'" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 1a9 9 0 000 18 9 9 0 000-18zm1 16V3a7 7 0 010 14z"/>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="hidden md:flex space-x-4 mr-auto"></div>
+
+
+        <div class="hidden md:flex space-x-4">
+            <a href="{{ route('login') }}" class="px-4 py-2 text-sm bg-blue-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-green-600 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Login</a>
+            <a href="{{ route('register') }}" class="px-4 py-2 text-sm bg-yellow-300 text-gray-800 dark:bg-gray-600 dark:text-white font-semibold rounded-full hover:bg-pink-400 dark:hover:bg-yellow-600 focus:outline-none transition duration-300 ease-in-out">Registro</a>
         </div>
     </div>
 </nav>
@@ -75,7 +101,6 @@
             </div>
         </div>
 
-        <!-- Right Col -->
         <div class="w-full lg:w-6/12 relative" id="girl">
             <img data-aos="fade-up" data-aos-once="true" class="w-16/14 mx-auto 2xl:-mb-20" src="{{ asset('img/planett.png') }}" />
             <div data-aos="fade-up" data-aos-delay="300" data-aos-once="true" class="absolute bottom-48 -left-6 sm:left-10 md:bottom-56 md:left-16 lg:-left-0 lg:bottom-60 floating-4">
@@ -94,12 +119,12 @@
         </div>
     </div>
 
-    <!--<div class="max-w-screen-xl mx-auto px-8 sm:px-16 mt-0" style="margin-top: 0 !important;">-->
-        <div class="mt-24"></div> <!-- Espacio de separación -->
 
-        <div class="max-w-screen-xl mx-auto px-8 sm:px-16 mt-5"> <!-- Contenedor principal con margen superior reducido -->
+        <div class="mt-24"></div>
+
+        <div class="max-w-screen-xl mx-auto px-8 sm:px-16 mt-5">
             <div class="sm:flex items-center sm:space-x-8 overflow-hidden">
-                <div data-aos="zoom-in" class="sm:w-1/2 relative flex flex-col items-center text-center"> <!-- items-center para centrar el contenido -->
+                <div data-aos="zoom-in" class="sm:w-1/2 relative flex flex-col items-center text-center">
                     <h1 class="font-semibold text-2xl text-green-700 mb-4 max-w-md">
                         Investigación y <span class="text-blue-900">Cultura</span>
                     </h1>

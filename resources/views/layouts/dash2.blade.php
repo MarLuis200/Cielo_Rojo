@@ -1,182 +1,104 @@
-@vite(['resources/js/bootstrap.js'])
-@vite(['resources/css/sb-admin-2.css'])
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cielo Rojo</title>
+    @vite(['resources/css/app.css'])
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
+<body class="bg-gray-100 font-sans antialiased">
 
-<body id="page-top">
-    <div id="wrapper">
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home">
-                <div class="flex justify-center">
-                    <img src="{{ asset('img/icon.png') }}" alt="Logo" class="h-12 w-auto" height="50" width="50">
-                </div>
-                <div class="sidebar-brand-text mx-3">Ambiente CieloRojo<sup></sup></div>
-            </a>
-            <hr class="sidebar-divider my-0">
-
-
-            <li class="nav-item active">
-                <a class="nav-link" href="/dash2">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-
-            <hr class="sidebar-divider">
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">Tablas</div>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/personas">
-                    <i class="bx bxs-user"></i>
-                    <span>Personas</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/publicaciones">
-                    <i class="bx bxs-user-account"></i>
-                    <span>Publicaciones</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/proveedores">
-                    <i class="bx bx-grid-alt"></i>
-                    <span>Proveedores</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/empleados">
-                    <i class="bx bx-user"></i>
-                    <span>Empleados</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/puestos">
-                    <i class='bx bxs-pin'></i>
-                    <span>Puestos</span>
-                </a>
-            </li>
-
-            <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/productos">
-                    <i class='bx bxs-cart'></i>
-                    <span>Productos</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-
-                <a class="nav-link" href="/admin/ventas">
-                    <i class="bx bx-shopping-bag"></i>
-                    <span>Ventas</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/inventario">
-                    <i class="bx bx-box"></i>
-                    <span>Inventario</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/tipo_publicacion">
-                    <i class="fas fa-tags"></i>
-                    <span>Tipo Publicacion</span>
-                </a>
-            </li>
-
-
-            <li class="nav-item">
-                <a class="nav-link" href="/">
-                    <i class="bx bx-log-out"></i>
-                    <span>Home</span>
-                </a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
-            <div id="content">
-
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-                        </li>
-
-                    </ul>
-
-                </nav>
-                <!-- End of Topbar -->
-
-
-                @yield('content')
-
-
-                <!-- /.container-fluid -->
-
-            </div>
-            <!-- End of Main Content -->
-
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-gradient-to-b from-gray-800 to-gray-900 text-white w-64 lg:w-64 hidden lg:flex flex-col shadow-xl overflow-y-auto ">
+        <div class="flex flex-col items-center">
+            <img src="{{ asset('img/icon.png') }}" alt="Logo" class="h-20 w-20 rounded-full shadow-md border-4 border-white">
+            <h1 class="text-3xl font-bold mt-4 tracking-wider text-yellow-400">Cielo Rojo</h1>
         </div>
-        <!-- End of Content Wrapper -->
 
+        <!-- Navigation -->
+        <nav class="flex-1 space-y-4">
+            <hr>
+            <a href="{{ route('dash2') }}"
+               class="flex items-center py-3 px-4 text-base {{ request()->routeIs('dash2') ? 'bg-yellow-500 text-gray-800' : 'hover:bg-yellow-400 hover:text-gray-900' }} rounded-lg transition duration-300">
+                <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+            </a>
+
+            <h2 class="text-md font-semibold uppercase text-gray-400">Administración</h2>
+
+            <a href="{{ route('admin.publicaciones') }}"
+               class="flex items-center py-3 px-4 text-base {{ request()->routeIs('admin.publicaciones') ? 'bg-yellow-500 text-gray-800' : 'hover:bg-yellow-400 hover:text-gray-900' }} rounded-lg transition duration-300">
+                <i class="fas fa-edit mr-3"></i> Publicaciones
+            </a>
+
+
+            <h2 class="text-md font-semibold uppercase text-gray-400">Publicaciones</h2>
+            <a href="{{ route('posts.project') }}"
+               class="flex items-center py-3 px-4 text-base {{ request()->routeIs('posts.project') ? 'bg-yellow-500 text-gray-800' : 'hover:bg-yellow-400 hover:text-gray-900' }} rounded-lg transition duration-300">
+                <i class="fas fa-tasks mr-3"></i> Proyectos
+            </a>
+
+            <a href="{{ route('posts.blog') }}"
+               class="flex items-center py-3 px-4 text-base {{ request()->routeIs('posts.blog') ? 'bg-yellow-500 text-gray-800' : 'hover:bg-yellow-400 hover:text-gray-900' }} rounded-lg transition duration-300">
+                <i class="fas fa-pen-fancy mr-3"></i> Blogs
+            </a>
+
+
+
+            <h2 class="text-md font-semibold uppercase text-gray-400">Comercio</h2>
+            <a href="/"
+               class="flex items-center py-3 px-4 text-base {{ request()->is('/') ? 'bg-yellow-500 text-gray-800' : 'hover:bg-yellow-400 hover:text-gray-900' }} rounded-lg transition duration-300">
+                <i class="fas fa-home mr-3"></i> Inicio
+            </a>
+        </nav>
+        <div class="mt-auto p-4">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-500 transition duration-300">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </aside>
+
+
+
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Topbar -->
+        <header class="bg-gradient-to-r from-gray-900 to-gray-700 shadow-lg px-6 py-4 flex justify-between items-center text-white">
+            <button id="sidebarToggle" class="lg:hidden focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <h1 class="text-4xl font-bold tracking-wide">Panel de Control</h1>
+            <div class="flex items-center space-x-4">
+                <button class="bg-gray-700 p-2 rounded-full hover:bg-yellow-500 focus:outline-none shadow-md">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="bg-gray-700 p-2 rounded-full hover:bg-yellow-500 focus:outline-none shadow-md">
+                    <i class="fas fa-user-circle text-3xl"></i>
+                </button>
+            </div>
+        </header>
+
+
+        <main class="flex-1 p-6">
+            @yield('content')
+        </main>
     </div>
-    <!-- End of Page Wrapper -->
+</div>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+<script>
+    // Sidebar toggle for mobile
+    const sidebarToggle = document.querySelector('#sidebarToggle');
+    const sidebar = document.querySelector('aside');
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+    });
+</script>
+
 </body>
 </html>
