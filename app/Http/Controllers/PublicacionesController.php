@@ -29,42 +29,62 @@ class PublicacionesController extends Controller
         return view('admin.publicaciones.crear', compact('posts'));
     }
 
-    public function store(Request $request)
-    {
-        // Validar los datos del formulario
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|in:blog,project',
-            'content' => 'required|array',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+  public function store(Request $request)
+  {
+      $validated = $request->validate([
+          'title' => 'required|string|max:255',
+          'category' => 'required|in:blog,project',
+          'content' => 'required|array',
+      ]);
 
-        $content = $request->input('content');
+      foreach ($validated['content'] as &$item) {
+          if ($item['type'] === 'video') {
+              $url = $item['value'];
+              $videoId = null;
+              $patterns = [
+                  '/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/',
+                  '/(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^&]+)/',
+                  '/(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^&]+)/',
+                  '/(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^&]+)/'
+              ];
 
-        // Procesar imágenes si existen
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('uploads', 'public');
-                if (isset($content[$index]) && $content[$index]['type'] === 'image') {
-                    $content[$index]['value'] = Storage::url($path);
-                }
-            }
-        }
+              foreach ($patterns as $pattern) {
+                  if (preg_match($pattern, $url, $matches)) {
+                      $videoId = $matches[1];
+                      break;
+                  }
+              }
 
-        $post = Post::create([
-            'title' => $request->title,
-            'category' => $request->category,
-            'content' => json_encode($content),
-        ]);
+              if (!$videoId && strlen($url) === 11) {
+                  $videoId = $url;
+              }
 
-        return redirect()->route('admin.publicaciones')
-            ->with('message', 'Publicación creada con éxito.');
-    }
+              if (!$videoId) {
+                  return response()->json([
+                      'message' => 'URL de YouTube no válida: ' . $url
+                  ], 422);
+              }
 
-    // Mostrar una publicación específica
+
+              $item['value'] = 'https://www.youtube.com/watch?v=' . $videoId;
+          }
+      }
+
+      $post = Post::create([
+          'title' => $validated['title'],
+          'category' => $validated['category'],
+          'content' => $validated['content'],
+      ]);
+
+      return response()->json([
+          'message' => 'Publicación creada con éxito',
+          'post' => $post
+      ], 201);
+  }
+
     public function show($id)
     {
-        $post = Post::findOrFail($id); // Obtener la publicación por ID
+        $post = Post::findOrFail($id);
         return view('admin.publicaciones.detalles', compact('post'));
     }
 
@@ -87,17 +107,15 @@ class PublicacionesController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|in:blog,project',
-            'fields' => 'required|array', // Validar los campos dinámicos
+            'fields' => 'required|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Obtener la publicación que se va a actualizar
+
         $post = Post::findOrFail($id);
 
-        // Obtener los campos del formulario (campos dinámicos)
-        $content = $request->input('fields'); // Obtenemos los campos dinámicos
 
-        // Procesar las imágenes si existen
+        $content = $request->input('fields');
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
                 $path = $image->store('uploads', 'public');

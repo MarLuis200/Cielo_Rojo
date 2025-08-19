@@ -14,21 +14,22 @@
                 </div>
 
                 <div class="p-4">
-                    <!-- Formulario dinámico -->
                     <form id="dynamicForm" class="space-y-4">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
 
                         <input type="text" id="postTitle" placeholder="Título de la publicación" class="border rounded p-2 w-full">
 
-                        <select id="postCategory" class="border rounded p-2 w-full">
-                            <option value="blog">Blog</option>
-                            <option value="project">Proyecto</option>
-                        </select>
+                      <select id="postCategory" class="border rounded p-2 w-full">
+                          <option value="blog">Blog</option>
+                          <option value="project">Proyecto</option>
+                      </select>
 
-                        <!-- Campos dinámicos -->
+                     <div class="mt-2 flex items-center space-x-2">
+                        <input type="text" id="postImage" placeholder="Contenido o URL" class="border rounded p-2 flex-grow">
+                     </div>
+
                         <div id="dynamicFields" class="space-y-4"></div>
 
-                        <!-- Botones -->
                         <div class="flex justify-between">
                             <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onclick="addField()">
                                 Agregar Elemento
@@ -48,7 +49,6 @@
                 </div>
                 <div class="p-4">
                     <div id="previewArea" class="border rounded-lg p-4 bg-gray-50 max-h-[600px] overflow-y-auto">
-                        <!-- Previsualización en tiempo real -->
                     </div>
                 </div>
             </div>
@@ -100,11 +100,11 @@
             updatePreview();
         }
 
-        // Actualizar la previsualización en tiempo real
+
         function updatePreview() {
             const fields = Array.from(document.querySelectorAll('#dynamicFields div'));
             const previewArea = document.getElementById('previewArea');
-            previewArea.innerHTML = ''; // Limpiar la previsualización antes de regenerarla
+            previewArea.innerHTML = '';
 
             fields.forEach(field => {
                 const type = field.querySelector('select').value;
@@ -133,45 +133,90 @@
             });
         }
 
-        // Extraer el ID de YouTube de una URL
-        function extractYouTubeID(url) {
-            const regex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)|youtu\.be\/([^&]+)/;
-            const match = url.match(regex);
-            return match ? match[1] || match[2] : null;
+
+
+    function extractYouTubeID(url) {
+
+        const patterns = [
+            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+            /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^&]+)/,
+            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^&]+)/,
+            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^&]+)/,
+            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/user\/\w+#\w\/\w+\/\w+\/([^&]+)/
+        ];
+
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) {
+                return match[1];
+            }
         }
 
-        // Publicar la publicación
-        document.getElementById('publishButton').addEventListener('click', async () => {
-            const title = document.getElementById('postTitle').value;
-            const category = document.getElementById('postCategory').value;
-            const fields = Array.from(document.querySelectorAll('#dynamicFields div')).map(field => {
-                return {
-                    type: field.querySelector('select').value,
-                    value: field.querySelector('input').value,
-                };
-            });
+        // Si no coincide con ningún patrón, asumimos que ya es un ID
+        return url.length === 11 ? url : null;
+    }
 
-            try {
-                const response = await fetch('/posts', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                    body: JSON.stringify({
-                        title: title,
-                        category: category,
-                        content: fields,
-                    }),
-                });
 
-                const result = await response.json();
-                alert(result.message);
-                window.location.reload();
-            } catch (error) {
-                console.error('Error al guardar la publicación:', error);
-                alert('Ocurrió un error al guardar la publicación.');
-            }
-        });
+       document.getElementById('publishButton').addEventListener('click', async () => {
+           const title = document.getElementById('postTitle').value;
+           const category = document.getElementById('postCategory').value;
+
+
+           const postImage = document.getElementById('postImage')?.value || document.getElementById('postImg')?.value;
+
+
+           let content = [];
+
+           if (postImage) {
+               content.push({
+                   type: 'image',
+                   value: postImage
+               });
+           }
+
+
+           const dynamicFields = Array.from(document.querySelectorAll('#dynamicFields div')).map(field => {
+               return {
+                   type: field.querySelector('select').value,
+                   value: field.querySelector('input').value,
+               };
+           });
+
+           content = content.concat(dynamicFields);
+
+           try {
+               const response = await fetch('{{ route("admin.publicaciones.store") }}', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                       'Accept': 'application/json'
+                   },
+                   body: JSON.stringify({
+                       title: title,
+                       category: category,
+                       content: content,
+                   }),
+               });
+
+               const result = await response.json();
+
+               if (response.ok) {
+                   alert(result.message || 'Publicación creada con éxito');
+                   window.location.reload();
+               } else {
+
+                   if (result.errors) {
+                       const errorMessages = Object.values(result.errors).join('\n');
+                       alert(`Errores:\n${errorMessages}`);
+                   } else {
+                       alert(result.message || 'Error al crear la publicación');
+                   }
+               }
+           } catch (error) {
+               console.error('Error:', error);
+               alert('Ocurrió un error al comunicarse con el servidor.');
+           }
+       });
     </script>
 @endsection
