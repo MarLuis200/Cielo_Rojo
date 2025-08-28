@@ -36,6 +36,7 @@ class LandingPageController extends Controller
         }
 
         return view('Landing.proyectos', compact('projects'));
+
     }
 
 
@@ -49,10 +50,28 @@ class LandingPageController extends Controller
         return view('landing.acerca');
     }
 
-    public function quienesSomos()
-    {
-        return view('landing.quienes-somos');
+public function quienesSomos()
+{
+
+    $projects = Post::where('category', 'project')->get();
+    foreach ($projects as $project) {
+        if (is_string($project->content)) {
+            $project->content = json_decode($project->content, true);
+        }
     }
+
+   $blogs = Post::where('category', 'blog')->take(3)->get();
+
+   foreach ($blogs as $blog) {
+       if (is_string($blog->content)) {
+           $blog->content = json_decode($blog->content, true);
+       }
+   }
+
+
+    return view('Landing.quienes-somos', compact('projects', 'blogs'));
+}
+
 
     public function premios()
     {
