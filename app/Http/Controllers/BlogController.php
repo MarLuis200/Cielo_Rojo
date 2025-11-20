@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
-    // Mostrar todos los blogs
     public function index()
     {
         $blogs = Blog::all();
@@ -25,7 +24,6 @@ class BlogController extends Controller
         return view('posts.blog.show', compact('blog'));
     }
 
-    // Mostrar el formulario de edición de un blog
     public function edit($id)
     {
         $blog = Blog::findOrFail($id);
@@ -33,7 +31,7 @@ class BlogController extends Controller
     }
 
 
-    // Eliminar un blog
+
     public function destroy($id)
     {
         $blog = Blog::findOrFail($id);

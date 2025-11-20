@@ -53,8 +53,8 @@
             <li><a href="{{ route('landing.blogs') }}" class="block hover:text-indigo-600 transition">Blogs</a></li>
             <li><a href="{{ route('landing.galeria') }}" class="block hover:text-indigo-600 transition">Galería De Fotos</a></li>
             <li><a href="{{ route('landing.acerca') }}" class="block hover:text-indigo-600 transition">Acerca de</a></li>
-            <li><a href="{{ route('landing.quienes.somos') }}" class="block hover:text-indigo-600 transition">¿Quiénes Somos?</a></li>
             <li><a href="{{ route('landing.premios') }}" class="block hover:text-indigo-600 transition">Premios</a></li>
+            <li><a href="{{ route('landing.quienes.somos') }}" class="block hover:text-indigo-600 transition">¿Quiénes Somos?</a></li>
             <li><a href="{{ route('landing.donaciones') }}" class="block hover:text-indigo-600 transition">Donaciones</a></li>
             @if (Auth::check())
                 <li>

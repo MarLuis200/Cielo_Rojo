@@ -10,25 +10,23 @@
             <div id="editorModal" class="bg-white rounded-lg shadow-lg w-1/2 mr-2 overflow-y-auto max-h-screen">
                 <div class="flex justify-between items-center p-4 border-b bg-gray-100">
                     <h5 class="text-lg font-semibold text-gray-800">Editor de Publicación</h5>
-                    <button id="closeModals" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                    <button class="closeModals text-gray-400 hover:text-gray-600 text-xl">&times;</button>
                 </div>
 
                 <div class="p-4">
-                    <form id="dynamicForm" class="space-y-4">
+                    <form id="dynamicForm" class="space-y-4" enctype="multipart/form-data">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-                        <input type="text" id="postTitle" placeholder="Título de la publicación" class="border rounded p-2 w-full">
+                        <input type="text" id="postTitle" placeholder="Título de la publicación" class="border rounded p-2 w-full" required>
 
-                      <select id="postCategory" class="border rounded p-2 w-full">
-                          <option value="blog">Blog</option>
-                          <option value="project">Proyecto</option>
-                      </select>
-
-                     <div class="mt-2 flex items-center space-x-2">
-                        <input type="text" id="postImage" placeholder="Contenido o URL" class="border rounded p-2 flex-grow">
-                     </div>
+                        <select id="postCategory" class="border rounded p-2 w-full" required>
+                            <option value="blog">Blog</option>
+                            <option value="project">Proyecto</option>
+                        </select>
 
                         <div id="dynamicFields" class="space-y-4"></div>
+
+                        <input type="file" id="imageFiles" name="image_files[]" multiple class="hidden" accept="image/*">
 
                         <div class="flex justify-between">
                             <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onclick="addField()">
@@ -45,7 +43,7 @@
             <div id="previewModal" class="bg-white rounded-lg shadow-lg w-1/2 ml-2 overflow-y-auto max-h-screen">
                 <div class="flex justify-between items-center p-4 border-b bg-gray-100">
                     <h5 class="text-lg font-semibold text-gray-800">Previsualización en Tiempo Real</h5>
-                    <button id="closeModals" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                    <button class="closeModals text-gray-400 hover:text-gray-600 text-xl">&times;</button>
                 </div>
                 <div class="p-4">
                     <div id="previewArea" class="border rounded-lg p-4 bg-gray-50 max-h-[600px] overflow-y-auto">
@@ -57,35 +55,53 @@
 
     <script>
         let fieldIndex = 0;
+        let imageFiles = {};
 
         // Abrir el modal
         document.getElementById('openModal').addEventListener('click', () => {
             document.getElementById('modalsContainer').classList.remove('hidden');
+            // Agregar campo de imagen por defecto
+            addField('image');
         });
 
         // Cerrar el modal
-        document.querySelectorAll('#closeModals').forEach(button => {
+        document.querySelectorAll('.closeModals').forEach(button => {
             button.addEventListener('click', () => {
                 document.getElementById('modalsContainer').classList.add('hidden');
             });
         });
 
         // Agregar campos dinámicos
-        function addField() {
+        function addField(type = null) {
             const container = document.getElementById('dynamicFields');
             const newField = document.createElement('div');
             newField.setAttribute('data-index', fieldIndex);
             newField.classList.add('flex', 'items-center', 'space-x-2', 'mb-2');
 
+            const fieldType = type || 'text';
+
             newField.innerHTML = `
-                <select name="fields[${fieldIndex}][type]" class="border rounded p-2 bg-white" onchange="updatePreview()">
-                    <option value="title">Título</option>
-                    <option value="subtitle">Subtítulo</option>
-                    <option value="text">Texto</option>
-                    <option value="image">Imagen</option>
-                    <option value="video">Video (YouTube)</option>
+                <select name="fields[${fieldIndex}][type]" class="field-type border rounded p-2 bg-white" onchange="updateFieldType(${fieldIndex})">
+                    <option value="title" ${fieldType === 'title' ? 'selected' : ''}>Título</option>
+                    <option value="subtitle" ${fieldType === 'subtitle' ? 'selected' : ''}>Subtítulo</option>
+                    <option value="text" ${fieldType === 'text' ? 'selected' : ''}>Texto</option>
+                    <option value="image" ${fieldType === 'image' ? 'selected' : ''}>Imagen</option>
+                    <option value="video" ${fieldType === 'video' ? 'selected' : ''}>Video (YouTube)</option>
                 </select>
-                <input type="text" name="fields[${fieldIndex}][value]" placeholder="Contenido o URL" class="border rounded p-2 w-full" oninput="updatePreview()">
+                <div class="field-input-container flex-1">
+                    ${fieldType === 'image' ? `
+                        <div class="flex space-x-2">
+                            <input type="text" name="fields[${fieldIndex}][value]" placeholder="URL de la imagen"
+                                   class="image-url border rounded p-2 w-full" oninput="updatePreview()">
+                            <button type="button" onclick="openFilePicker(${fieldIndex})" class="px-3 bg-gray-200 rounded hover:bg-gray-300 text-sm">
+                                📁 Subir
+                            </button>
+                        </div>
+                    ` : `
+                        <input type="text" name="fields[${fieldIndex}][value]" placeholder="Contenido o URL"
+                               class="border rounded p-2 w-full" oninput="updatePreview()">
+                    `}
+                </div>
                 <button type="button" onclick="removeField(${fieldIndex})" class="text-red-500 hover:text-red-700">X</button>
             `;
 
@@ -94,13 +110,69 @@
             updatePreview();
         }
 
-        // Eliminar un campo
-        function removeField(index) {
-            document.querySelector(`[data-index="${index}"]`).remove();
+        // Actualizar tipo de campo
+        function updateFieldType(index) {
+            const field = document.querySelector(`[data-index="${index}"]`);
+            const type = field.querySelector('.field-type').value;
+            const valueInput = field.querySelector('input');
+            const value = valueInput ? valueInput.value : '';
+
+            const container = field.querySelector('.field-input-container');
+            if (type === 'image') {
+                container.innerHTML = `
+                    <div class="flex space-x-2">
+                        <input type="text" name="fields[${index}][value]" placeholder="URL de la imagen"
+                               value="${value}" class="image-url border rounded p-2 w-full" oninput="updatePreview()">
+                        <button type="button" onclick="openFilePicker(${index})" class="px-3 bg-gray-200 rounded hover:bg-gray-300 text-sm">
+                            📁 Subir
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <input type="text" name="fields[${index}][value]" placeholder="Contenido o URL"
+                           value="${value}" class="border rounded p-2 w-full" oninput="updatePreview()">
+                `;
+            }
             updatePreview();
         }
 
+        // Abrir selector de archivos
+        function openFilePicker(index) {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = (e) => handleImageUpload(e, index);
+            fileInput.click();
+        }
 
+        // Manejar subida de imagen
+        function handleImageUpload(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Guardar archivo para enviar al servidor
+            imageFiles[index] = file;
+
+            // Mostrar previsualización
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const field = document.querySelector(`[data-index="${index}"]`);
+                const urlInput = field.querySelector('.image-url');
+                urlInput.value = e.target.result;
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Eliminar un campo
+        function removeField(index) {
+            document.querySelector(`[data-index="${index}"]`).remove();
+            delete imageFiles[index];
+            updatePreview();
+        }
+
+        // Actualizar la previsualización
         function updatePreview() {
             const fields = Array.from(document.querySelectorAll('#dynamicFields div'));
             const previewArea = document.getElementById('previewArea');
@@ -108,7 +180,7 @@
 
             fields.forEach(field => {
                 const type = field.querySelector('select').value;
-                const value = field.querySelector('input').value;
+                const value = field.querySelector('input')?.value;
 
                 let previewElement = document.createElement('div');
 
@@ -133,90 +205,85 @@
             });
         }
 
+        function extractYouTubeID(url) {
+            const patterns = [
+                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+                /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^&]+)/,
+                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^&]+)/,
+            ];
 
-
-    function extractYouTubeID(url) {
-
-        const patterns = [
-            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
-            /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^&]+)/,
-            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^&]+)/,
-            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^&]+)/,
-            /(?:https?:\/\/)?(?:www\.)?youtube\.com\/user\/\w+#\w\/\w+\/\w+\/([^&]+)/
-        ];
-
-        for (const pattern of patterns) {
-            const match = url.match(pattern);
-            if (match && match[1]) {
-                return match[1];
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
             }
+            return url.length === 11 ? url : null;
         }
 
-        // Si no coincide con ningún patrón, asumimos que ya es un ID
-        return url.length === 11 ? url : null;
-    }
+        // Publicar la publicación - VERSIÓN CORREGIDA
+        document.getElementById('publishButton').addEventListener('click', async function() {
+            console.log('🔵 Botón de publicar clickeado');
 
+            const title = document.getElementById('postTitle').value;
+            const category = document.getElementById('postCategory').value;
 
-       document.getElementById('publishButton').addEventListener('click', async () => {
-           const title = document.getElementById('postTitle').value;
-           const category = document.getElementById('postCategory').value;
+            const fields = Array.from(document.querySelectorAll('#dynamicFields div')).map(field => {
+                return {
+                    type: field.querySelector('select').value,
+                    value: field.querySelector('input')?.value || '',
+                };
+            });
 
+            // Validaciones
+            if (!title) {
+                alert('El título es obligatorio');
+                return;
+            }
 
-           const postImage = document.getElementById('postImage')?.value || document.getElementById('postImg')?.value;
+            const hasImage = fields.some(field => field.type === 'image' && field.value);
+            if (!hasImage) {
+                alert('La publicación debe contener al menos una imagen (URL o archivo)');
+                return;
+            }
 
+            // Preparar FormData
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('content', JSON.stringify(fields));
 
-           let content = [];
+            // Agregar archivos
+            Object.entries(imageFiles).forEach(([index, file]) => {
+                formData.append(`image_files[${index}]`, file);
+            });
 
-           if (postImage) {
-               content.push({
-                   type: 'image',
-                   value: postImage
-               });
-           }
+            try {
+                console.log('🔄 Enviando solicitud...');
 
+                const response = await fetch('/admin/publicaciones', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: formData,
+                });
 
-           const dynamicFields = Array.from(document.querySelectorAll('#dynamicFields div')).map(field => {
-               return {
-                   type: field.querySelector('select').value,
-                   value: field.querySelector('input').value,
-               };
-           });
+                console.log('📥 Respuesta recibida. Status:', response.status);
 
-           content = content.concat(dynamicFields);
+                const result = await response.json();
+                console.log('Resultado:', result);
 
-           try {
-               const response = await fetch('{{ route("admin.publicaciones.store") }}', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json',
-                       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                       'Accept': 'application/json'
-                   },
-                   body: JSON.stringify({
-                       title: title,
-                       category: category,
-                       content: content,
-                   }),
-               });
-
-               const result = await response.json();
-
-               if (response.ok) {
-                   alert(result.message || 'Publicación creada con éxito');
-                   window.location.reload();
-               } else {
-
-                   if (result.errors) {
-                       const errorMessages = Object.values(result.errors).join('\n');
-                       alert(`Errores:\n${errorMessages}`);
-                   } else {
-                       alert(result.message || 'Error al crear la publicación');
-                   }
-               }
-           } catch (error) {
-               console.error('Error:', error);
-               alert('Ocurrió un error al comunicarse con el servidor.');
-           }
-       });
+                if (response.ok) {
+                    alert('✅ ' + (result.message || 'Publicación creada con éxito'));
+                    window.location.reload();
+                } else {
+                    alert('❌ ' + (result.message || 'Error al crear la publicación'));
+                }
+            } catch (error) {
+                console.error('💥 Error completo:', error);
+                alert('❌ Error de conexión: ' + error.message);
+            }
+        });
     </script>
 @endsection

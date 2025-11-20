@@ -19,7 +19,7 @@
     <div class="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
         <div class="flex items-center space-x-2 rtl:space-x-reverse mr-auto group">
             <img src="{{ asset('img/cielo2.png') }}" class="h-10 w-10 rounded-full transform group-hover:scale-110 transition-transform duration-300" alt="Logo">
-            <span class="self-center text-xl md:text-2xl font-bold whitespace-nowrap text-gray-800 dark:text-white">Cielo<span class="text-red-600">Rojo</span></span>
+            <span class="self-center text-xl md:text-2xl font-bold whitespace-nowrap text-gray-800 dark:text-white"> Ambiente <span class="text-red-600">Cielo Rojo</span></span>
         </div>
 
         <div class="flex items-center space-x-3 md:space-x-6 md:order-2">
@@ -49,33 +49,42 @@
                 <li>
                     <a href="{{ route('landing.quienes.somos') }}" class="block py-2 px-4 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg md:hover:bg-transparent md:dark:hover:bg-transparent md:p-0 transition-all duration-300 hover:text-red-600 dark:hover:text-yellow-300">¿Quiénes Somos?</a>
                 </li>
+            <li>
+                                <a href="{{ route('landing.premios') }}" class="block py-2 px-4 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg md:hover:bg-transparent md:dark:hover:bg-transparent md:p-0 transition-all duration-300 hover:text-red-600 dark:hover:text-yellow-300">Premios</a>
+                            </li>
                 <li>
                     <a href="{{ route('landing.acerca') }}" class="block py-2 px-4 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg md:hover:bg-transparent md:dark:hover:bg-transparent md:p-0 transition-all duration-300 hover:text-red-600 dark:hover:text-yellow-300">Acerca De</a>
                 </li>
-                <li>
-                    <!-- ENLACE CORREGIDO: Se quitaron las clases de color fijas -->
-                    <a href="{{ route('landing.premios') }}" class="block py-2 px-4 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg md:hover:bg-transparent md:dark:hover:bg-transparent md:p-0 transition-all duration-300 hover:text-red-600 dark:hover:text-yellow-300">Premios</a>
-                </li>
-                <li>
+                                <li>
                     <a href="{{ route('landing.donaciones') }}" class="block py-2 px-4 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg md:hover:bg-transparent md:dark:hover:bg-transparent md:p-0 transition-all duration-300 hover:text-red-600 dark:hover:text-yellow-300">Donaciones</a>
                 </li>
 
-                <li class="mt-3 md:mt-0 md:ml-4">
-                    <button @click="theme = theme === 'light' ? 'dark' : 'light'" class="p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition duration-300 ease-in-out focus:outline-none hover:scale-110 shadow-md">
-                        <svg x-show="theme === 'light'" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 5a5 5 0 000 10 5 5 0 000-10zm0-3a1 1 0 110 2h-.02a1 1 0 010-2H10zm0 16a1 1 0 110 2h-.02a1 1 0 010-2H10zm9-9a1 1 0 110 2v-.02a1 1 0 110-2V10zm-16 0a1 1 0 110 2H3a1 1 0 010-2h.02zM15.45 6.14a1 1 0 011.41 0l.02.02a1 1 0 010 1.41L16.88 8a1 1 0 11-1.41-1.42l-.02-.02zM4.12 13.76a1 1 0 110 1.42l-.02.02a1 1 0 01-1.41 0L2 14.17a1 1 0 111.42-1.41l.02.02z"/>
-                        </svg>
-                        <svg x-show="theme === 'dark'" class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 1a9 9 0 000 18 9 9 0 000-18zm1 16V3a7 7 0 010 14z"/>
-                        </svg>
-                    </button>
-                </li>
+
             </ul>
         </div>
 
         <div class="hidden md:flex space-x-3 ml-6">
-            <a href="{{ route('login') }}" class="px-4 py-2 text-sm bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold rounded-full hover:from-blue-500 hover:to-blue-700 focus:outline-none transition-all duration-300 transform hover:scale-105 shadow-md">Login</a>
-            <a href="{{ route('register') }}" class="px-4 py-2 text-sm bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold rounded-full hover:from-yellow-500 hover:to-yellow-700 focus:outline-none transition-all duration-300 transform hover:scale-105 shadow-md">Registro</a>
+            @guest
+                <!-- Si NO hay sesión iniciada -->
+                <a href="{{ route('login') }}"
+                   class="px-4 py-2 text-sm bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold rounded-full hover:from-blue-500 hover:to-blue-700 focus:outline-none transition-all duration-300 transform hover:scale-105 shadow-md">
+                   Login
+                </a>
+                <a href="{{ route('register') }}"
+                   class="px-4 py-2 text-sm bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold rounded-full hover:from-yellow-500 hover:to-yellow-700 focus:outline-none transition-all duration-300 transform hover:scale-105 shadow-md">
+                   Registro
+                </a>
+            @endguest
+
+            @auth
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                            class="px-4 py-2 text-sm bg-gradient-to-r from-red-400 to-red-600 text-white font-semibold rounded-full hover:from-red-500 hover:to-red-700 focus:outline-none transition-all duration-300 transform hover:scale-105 shadow-md">
+                        Cerrar sesión
+                    </button>
+                </form>
+            @endauth
         </div>
     </div>
 </nav>
@@ -121,9 +130,10 @@
         <div class="max-w-screen-xl mx-auto px-8 sm:px-16 mt-5">
             <div class="sm:flex items-center sm:space-x-8 overflow-hidden">
                 <div data-aos="zoom-in" class="sm:w-1/2 relative flex flex-col items-center text-center">
-                    <h1 class="font-semibold text-2xl text-green-700 mb-4 max-w-md">
-                        Investigación y <span class="text-blue-900">Cultura</span>
-                    </h1>
+                   <h1 class="font-bold text-3xl mb-4 max-w-md">
+                       Investigación y <span class="text-red-900"> Cultura
+                       </span>
+                   </h1>
                     <div class="flex flex-col items-center max-w-md">
                         <p class="py-5 text-justify">Investigación y Comunicación Audiovisual: Medio Ambiente y Cultura. Nuestro proyecto se enfoca en la preservación del entorno natural y la promoción de la diversidad cultural.</p>
                         <p class="py-5 text-justify">Desde la creación de Proyectos hasta la organización de eventos de concientización, nuestro objetivo es inspirar a la comunidad para proteger nuestro planeta.</p>
@@ -131,7 +141,7 @@
                 </div>
 
 
-                <div data-aos="zoom-in" class="sm:w-1/2 relative mt-5 sm:mt-0"> <!-- Efecto de acercamiento -->
+                <div data-aos="zoom-in" class="sm:w-1/2 relative mt-5 sm:mt-0">
                     <div class="rounded-xl z-40 relative max-w-full bg-gray-900 bg-opacity-80 p-4" style="padding-bottom: 56.25%; height: 0;">
                         <iframe
                             src="https://www.youtube.com/embed/EBgZ-SdkOtQ?rel=0&controls=1&loop=1&playlist=EBgZ-SdkOtQ"
@@ -146,24 +156,30 @@
             </div>
         </div>
 
-        <!-- Separación entre los bloques -->
-        <div class="mt-24"></div> <!-- Espacio de separación -->
 
-        <div class="max-w-screen-xl mx-auto px-8 sm:px-16 mt-5"> <!-- Contenedor principal con margen superior reducido -->
+        <div class="mt-24"></div>
+
+        <div class="max-w-screen-xl mx-auto px-8 sm:px-16 mt-5">
 
             <div class="sm:flex items-center sm:space-x-8 overflow-hidden">
-                <div data-aos="zoom-in" class="sm:w-1/2 relative flex flex-col items-center text-center"> <!-- items-center para centrar el contenido -->
-                    <h1 class="font-semibold text-2xl text-green-700 mb-4 max-w-md text-justify">
-                        Gobernanza del agua en las comunidades <span class="text-blue-900">de la Cuenca del Río San Juan Zitácuaro</span>
-                    </h1>
+                <div data-aos="zoom-in" class="sm:w-1/2 relative flex flex-col items-center text-center">
+                   <h1 class="text-4xl font-extrabold leading-snug mb-6 max-w-2xl text-center">
+                     <span class="text-black drop-shadow-lg">
+                       Gobernanza del agua en las comunidades de la
+                     </span>
+                     <span class="bg-gradient-to-r from-sky-500 via-teal-500 to-green-500 bg-clip-text text-transparent drop-shadow-lg">
+                       Cuenca del Río San Juan Zitácuaro
+                     </span>
+                   </h1>
                     <div class="flex flex-col items-center max-w-md">
                         <p class="py-5 text-justify">La crisis del agua avanza rápidamente, y la gobernanza hídrica comunitaria se presenta como un modelo ideal para enfrentarla en el medio rural.</p>
                         <p class="py-5 text-justify">Este enfoque ha demostrado ser efectivo en la Cuenca del Río San Juan Zitácuaro, ubicada en la región de la mariposa monarca, donde las comunidades se esfuerzan por preservar y gestionar sus recursos hídricos.</p>
                     </div>
                 </div>
 
-                <div data-aos="zoom-in" class="sm:w-1/2 relative mt-5 sm:mt-0"> <!-- Efecto de acercamiento -->
+                <div data-aos="zoom-in" class="sm:w-1/2 relative mt-5 sm:mt-0">
                     <div class="rounded-xl z-40 relative max-w-full bg-gray-900 bg-opacity-80 p-4" style="padding-bottom: 56.25%; height: 0;">
+
                         <iframe
                             src="https://www.youtube.com/embed/MBM4yN-8yYE?rel=0&showinfo=0&controls=1"
                             title="Gobernanza del agua en las comunidades de la Cuenca del Río San Juan Zitácuaro"
@@ -172,20 +188,21 @@
                             allowfullscreen
                             class="absolute top-0 left-0 w-full h-full rounded-xl">
                         </iframe>
+
                     </div>
                 </div>
             </div>
         </div>
 
-                <!-- Separación entre los bloques -->
-        <div class="mt-10"></div> <!-- Espacio de separación -->
+        <div class="mt-10"></div>
 
         <section class="bg-white text-black py-12">
             <div class="max-w-screen-xl mx-auto px-8 sm:px-16">
             <div data-aos="fade-down" class="text-center mb-6">
                 <h2 data-aos="fade-down" class="font-semibold text-center text-green-700 mb-6 text-4xl">
-                    Documental <br>
-                    <span class="text-blue-900 text-2xl">El taco Mazahua, entre el oro verde y la monarca</span>
+
+                    <span class="text-black drop-shadow-lg"> Documental <br></span>
+                    <span class="text-blue-900 text-2xl drop-shadow-lg">El taco Mazahua, entre el oro verde y la monarca</span>
                 </h2>
             </div>
 

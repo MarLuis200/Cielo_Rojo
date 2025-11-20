@@ -45,6 +45,12 @@ class Kernel extends HttpKernel
         ],
     ];
 
+    protected $routeMiddleware = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'redirect.by.role' => \App\Http\Middleware\RedirectByRole::class,
+    ];
+
+
     /**
      * The application's middleware aliases.
      *

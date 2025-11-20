@@ -34,20 +34,9 @@ Route::get('/donaciones', [LandingPageController::class, 'donaciones'])->name('l
 Route::get('/dash2', [Dash2Controller::class, 'index'])->name('dash2')->middleware('auth');
 
 
-Route::prefix('admin/personas')->name('admin.personas.')->group(function () {
-    Route::get('/', [PersonasController::class, 'index'])->name('index');
-    Route::get('/crear', [PersonasController::class, 'crear'])->name('crear');
-    Route::get('/show/{id}', [PersonasController::class, 'show'])->name('detalles');
-    Route::get('/actualizar/{id}', [PersonasController::class, 'actualizar'])->name('actualizar');
-    Route::put('/update/{id}', [PersonasController::class, 'update'])->name('update');
-    Route::delete('/eliminar/{id}', [PersonasController::class, 'eliminar'])->name('eliminar');
-    Route::post('/store', [PersonasController::class, 'store'])->name('store');
-});
-
 Route::get('/posts/{category}', [PostController::class, 'index']);
 Route::post('/posts', [PostController::class, 'store']);
 
-// Mostrar todas las publicaciones
 Route::get('/admin/publicaciones', [PublicacionesController::class, 'index'])->name('admin.publicaciones');
 Route::get('/admin/publicaciones/{id}', [PublicacionesController::class, 'show'])->name('admin.publicaciones.show');
 Route::get('/admin/publicaciones/crear', [PublicacionesController::class, 'crear'])->name('admin.publicaciones.crear');
@@ -55,7 +44,6 @@ Route::post('/admin/publicaciones', [PublicacionesController::class, 'store'])->
 Route::get('/admin/publicaciones/{id}/edit', [PublicacionesController::class, 'editar'])->name('admin.publicaciones.edit');
 Route::put('/admin/publicaciones/{id}', [PublicacionesController::class, 'update'])->name('admin.publicaciones.update');
 Route::delete('/admin/publicaciones/{id}', [PublicacionesController::class, 'eliminar'])->name('admin.publicaciones.eliminar');
-
 
 Route::prefix('posts')->group(function () {
     Route::middleware('auth')->group(function () {
@@ -74,6 +62,11 @@ Route::prefix('posts')->group(function () {
 
 
 
+
+Route::get('/', [LandingPageController::class, 'index'])->name('landing.index');
+Route::middleware(['auth', 'redirect.by.role'])->group(function () {
+    Route::get('/dash2', [Dash2Controller::class, 'index'])->name('dash2');
+});
 
 Route::get('/page', function () {
     return view('page.page');
