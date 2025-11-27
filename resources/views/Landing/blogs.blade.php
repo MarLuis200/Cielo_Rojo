@@ -167,42 +167,51 @@
     </div>
 </div>
 
-
-
 <div id="blogs" data-aos="zoom-in" class="mt-16 text-center">
     <h1 class="text-3xl font-extrabold text-blue-500 dark:text-amber-300">Nuestros Blogs</h1>
 </div>
 
-<div class="lg:w-10/12 mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12">
+<div class="lg:w-11/12 mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-12">
     @foreach ($blogs as $blog)
-        <a href="{{ route('posts.blog.show', $blog->id) }}" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-            <div class="relative overflow-hidden rounded-lg">
-                <!-- Aquí estamos extrayendo la URL de la primera imagen del contenido -->
-                @if(isset($blog->content[0]['value']))
-                    <img class="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="{{ $blog->content[0]['value'] }}" alt="{{ $blog->title }}">
-                @else
-                    <img  class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="default-image.jpg" alt="Imagen predeterminada">
-                @endif
-                <span class="absolute bottom-2 left-2 bg-blue-300 text-darken font-semibold px-4 py-px text-sm rounded-full">{{ $blog->title }}</span>
+        @php
+            // Asegurarnos de que contenido sea un array
+            $contenido = $blog->contenido ?? [];
+
+            // Obtener la primera imagen
+            $imagen = 'default-image.jpg';
+            foreach ($contenido as $element) {
+                if (($element['type'] ?? '') === 'image' && !empty($element['value'])) {
+                    $imagen = asset(str_replace('\\', '/', $element['value']));
+                    break;
+                }
+            }
+
+            // Obtener el primer texto
+            $firstText = null;
+            foreach ($contenido as $element) {
+                if (($element['type'] ?? '') === 'text' && !empty($element['value'])) {
+                    $firstText = $element['value'];
+                    break;
+                }
+            }
+        @endphp
+
+        <a href="{{ route('blogs.detail', $blog->id) }}"
+           data-aos="fade-up" data-aos-delay="100" data-aos-duration="800"
+           class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 group">
+
+            <div class="relative overflow-hidden rounded-lg w-full h-48">
+                <img class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg"
+                     src="{{ $imagen }}"
+                     alt="{{ $blog->nombre }}">
+                <span class="absolute bottom-2 left-2 bg-blue-300 text-darken font-semibold px-4 py-1 text-sm rounded-full">
+                    {{ $blog->nombre }}
+                </span>
             </div>
+
             <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">
-                @php
-                    $firstText = null;
-                    foreach ($blog->content as $element) {
-                        if ($element['type'] === 'text') {
-                            $firstText = $element['value'];
-                            break;
-                        }
-                    }
-                @endphp
-
-                @if($firstText)
-                    {{ $firstText }}
-                @else
-                    Descripción no disponible.
-                @endif
+                {{ $firstText ?? 'Descripción no disponible.' }}
             </p>
-
         </a>
     @endforeach
 </div>

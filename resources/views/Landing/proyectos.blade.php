@@ -180,38 +180,47 @@
     <h1 class="text-3xl font-extrabold text-blue-500 dark:text-amber-300">Nuestros Proyectos</h1>
 </div>
 
-<div class="lg:w-10/12 mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12">
-    @foreach ($projects as $project)
-        <a href="{{ route('posts.project.show', $project->id) }}"  data-aos="fade-up" data-aos-delay="100" data-aos-duration="800" class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-transparent group">
-            <div class="relative overflow-hidden rounded-lg">
-                @if(isset($project->content[0]['value']))
-                    <img class="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="{{ $project->content[0]['value'] }}" alt="{{ $project->title }}">
-                @else
-                    <img class="w-full transform transition-transform duration-500 group-hover:scale-110 rounded-lg" src="default-image.jpg" alt="Imagen predeterminada">
-                @endif
-                <span class="absolute bottom-2 left-2 bg-blue-300 text-darken font-semibold px-4 py-px text-sm rounded-full">{{ $project->title }}</span>
-            </div>
-            <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">
-                @php
-                    $firstText = null;
-                    foreach ($project->content as $element) {
-                        if ($element['type'] === 'text') {
-                            $firstText = $element['value'];
-                            break;
-                        }
-                    }
-                @endphp
+<div class="lg:w-11/12 mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-12">
+    @foreach ($proyectos as $proyecto)
+        @php
+            $contenido = $proyecto->contenido ?? [];
 
-                @if($firstText)
-                    {{ $firstText }}
-                @else
-                    Descripción no disponible.
-                @endif
+            $imagen = 'default-image.jpg';
+            foreach ($contenido as $element) {
+                if ($element['type'] === 'image' && !empty($element['value'])) {
+                    $imagen = $element['value'];
+                    break;
+                }
+            }
+
+            $firstText = null;
+            foreach ($contenido as $element) {
+                if ($element['type'] === 'text' && !empty($element['value'])) {
+                    $firstText = $element['value'];
+                    break;
+                }
+            }
+        @endphp
+
+       <a href="{{ route('proyectos.detail', $proyecto->id) }}"
+           data-aos="fade-up" data-aos-delay="100" data-aos-duration="800"
+           class="flex flex-col items-center text-center rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 group">
+
+            <div class="relative overflow-hidden rounded-lg w-full h-48">
+                <img class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110 rounded-lg"
+                     src="{{ $imagen }}"
+                     alt="{{ $proyecto->nombre }}">
+                <span class="absolute bottom-2 left-2 bg-blue-300 text-darken font-semibold px-4 py-1 text-sm rounded-full">
+                    {{ $proyecto->nombre }}
+                </span>
+            </div>
+
+            <p class="text-gray-600 dark:text-gray-300 my-4 text-sm text-justify group-hover:text-gray-500 transition-colors duration-300" style="font-family: 'Poppins', sans-serif;">
+                {{ $firstText ?? 'Descripción no disponible.' }}
             </p>
         </a>
     @endforeach
 </div>
-
 
 
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
